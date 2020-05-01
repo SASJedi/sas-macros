@@ -1,0 +1,13 @@
+%macro fdelete(fname);
+   %local rc fileref;
+   %let rc=%sysfunc(filename(fileref,%superq(fname)));
+   %if not &rc %then %let rc=%sysfunc(fdelete(&fileref));
+   %if &rc %then %do;
+      %let msg=%qsysfunc(sysmsg());
+      %put &=rc - Could not delete %superq(fname);
+      %put %superq(msg);
+      %return;
+   %end;
+   %put NOTE: (&SYSMACRONAME) %superq(fname) deleted.;
+   %let rc=%sysfunc(filename(fileref));
+%mend;

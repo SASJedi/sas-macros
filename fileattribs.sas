@@ -1,0 +1,42 @@
+%macro fileattribs(filename,B,CDT,MDT);
+   %local rc fid fidc type;
+	%let type=NOTE;
+   %if %qupcase(%superq(filename))=!HELP 
+   %then %do;
+   %let type=NOTE;
+%syntax:
+   %PUT ;
+   %PUT &TYPE:  *&SYSMACRONAME Documentation *******************************;
+   %PUT &TYPE-;
+   %PUT &TYPE-  Gets byte size, create datetime and mod datatime for a file.;
+   %PUT &TYPE-;
+   %PUT &TYPE-  SYNTAX: %NRSTR(%fileattribs%(filename,b,CDT,MDT%));
+   %PUT &TYPE-     filename=fully qualified filename;
+   %PUT &TYPE-     B  =name of macro variable you want to hold Bytes;
+   %PUT &TYPE-     CDT=name of macro variable you want to hold Creation datetime.;
+   %PUT &TYPE-     MDT=name of macro variable you want to hold Modification datetime.;
+   %PUT ;
+   %PUT &TYPE-  Example: ;
+   %PUT &TYPE-  %NRSTR(%%fileattribs%(c:\temp\test.csv, Bytes, Created, Modified%));
+   %PUT ;
+   %PUT &TYPE-  *************************************************************;
+   %PUT ;
+   %RETURN;
+%end;
+   %let rc=%sysfunc(filename(onefile,&filename));
+   %if &rc ^= 0 %then %do;
+      %put ERROR: (&SYSMACRONAME) Unable to assign fileref to %superq(filename).;
+      %goto syntax;
+   %end;
+   %let fid=%sysfunc(fopen(&onefile));
+   %if &fid=0 %then %do;
+      %put ERROR: (&SYSMACRONAME) Unable to open %superq(filename).;
+      %goto syntax;
+   %end;
+   %let &b=%qsysfunc(finfo(&fid,%nrstr(File Size %(bytes%))));
+   %let &CDT=%qsysfunc(finfo(&fid,Create Time));
+   %let &MDT=%qsysfunc(finfo(&fid,Last Modified));
+   %let fidc=%sysfunc(fclose(&fid));
+   %let rc=%sysfunc(filename(onefile));
+/*   %put NOTE: File: &filename Bytes: &B Created:&CDT Modified:&MDT;*/
+%mend FileAttribs;
