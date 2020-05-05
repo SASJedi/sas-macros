@@ -1,6 +1,6 @@
 # sas-macros
 <h2>Selected useful macros from my personal SAS macro library</h2> 
-1. Download the files an save them to a folder in your SASAUTOS autocall path. 
+1. Download the files an save them to a folder in your SASAUTOS autocall path. <br>
 2. call the macro by name with !help at the parameter to get syntax help in the log.<br> 
    For example:<br>
       <b>%data2datastep(!help)</b><br><br>
