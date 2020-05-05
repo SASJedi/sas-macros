@@ -5,7 +5,7 @@
    For example:<br>
       <b>%data2datastep(!help)</b><br><br>
    Produces this text in the SAS log:<br><br>
-   NOTE: DATA2DATASTEP macro help document<br>:
+   NOTE: DATA2DATASTEP macro help document:<br>
       Purpose: Converts a data set to a SAS DATA step.<br>
       Syntax: %DATA2DATASTEP(dsn<,lib,outlib,file,obs,fmt,lbl>)<br>
       dsn:    Name of the dataset to be converted. Required.<br>
