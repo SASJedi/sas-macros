@@ -25,4 +25,3 @@ NOTE:   DATA2DATASTEP cannot be used in-line - it generates code.
         Data set label is automatically re-created.
         Only numeric column formats can be re-created, character column formats are ingnored.
         Use !HELP to print these notes.
-
