@@ -1,10 +1,10 @@
 # sas-macros
-Selected useful macros from my personal SAS macro library 
+<h2>Selected useful macros from my personal SAS macro library</h2> 
 1. Download the files an save them to a folder in your SASAUTOS autocall path. 
 2. call the macro by name with !help at the parameter to get syntax help in the log.<br> 
    For example:<br>
-      %data2datastep(!help)<br>
-   Produces this text in the SAS log:<br>
+      <b>%data2datastep(!help)</b><br><br>
+   Produces this text in the SAS log:<br><br>
    NOTE: DATA2DATASTEP macro help document<br>:
       Purpose: Converts a data set to a SAS DATA step.<br>
       Syntax: %DATA2DATASTEP(dsn<,lib,outlib,file,obs,fmt,lbl>)<br>
@@ -20,7 +20,7 @@ Selected useful macros from my personal SAS macro library
       lbl:    Reproduce column labels in the output dataset?<br>
               (YES|NO - Optional) Default is YES<br>
 <br>
-NOTE:   DATA2DATASTEP cannot be used in-line - it generates code.<br>
+<b>NOTE:</b>   DATA2DATASTEP cannot be used in-line - it generates code.<br>
         Every FORMAT in the original data must have a corresponding INFORMAT of the same name.<br>
         Data set label is automatically re-created.<br>
         Only numeric column formats can be re-created, character column formats are ingnored.<br>
