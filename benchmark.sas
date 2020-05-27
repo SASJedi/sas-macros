@@ -7,18 +7,8 @@
    2. logparse.sas
    3. passinfo.sas 
   ***************************************************************************/
-
 %let MSGTYPE=NOTE;
-%if %SUPERQ(ProgramFile1)= %then %do;
-   %let MSGTYPE=ERROR;
-   %PUT &MSGTYPE:  *&sysmacroname ERROR ***************************************;
-   %PUT &MSGTYPE-  You must specify the name of the SAS program file;
-   %PUT &MSGTYPE-  If not in the default directory, include full path;
-   %goto Syntax;
-%end;
-%if %qupcase(%qsubstr(%superq(ProgramFile1),1,5))=!HELP 
-       OR %qupcase(%qsubstr(%superq(ProgramFile1),1,4))=HELP 
-   %then %do;
+%if %superq(ProgramFile1)=? %then %do;
    %PUT &MSGTYPE:  *&SYSMACRONAME Documentation *******************************;
 %syntax: %put;
    %PUT &MSGTYPE-  SYNTAX: %NRSTR(%benchmark%(ProgramFile1,ProgramFile2,TimesToRun,Details%));
@@ -33,9 +23,26 @@
    %PUT &MSGTYPE-  Benchmarking a program:;
    %PUT &MSGTYPE-  %NRSTR(%benchmark%(s:\workshop\MyProgram1.sas);
    %PUT &MSGTYPE-  %NRSTR(           ,s:\workshop\MyProgram2.sas,6,Y%));
-   %PUT ;
    %PUT &MSGTYPE-  *************************************************************;
+   %PUT ;
+   %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+   %PUT ;
    %RETURN;
+%end;
+%if %qupcase(%qsubstr(%superq(ProgramFile1),1,5))=!HELP %then goto Syntax;
+%if %SUPERQ(ProgramFile1)= %then %do;
+   %let MSGTYPE=ERROR;
+   %PUT &MSGTYPE:  *&sysmacroname ERROR ***************************************;
+   %PUT &MSGTYPE-  You must specify the name of the first SAS program file;
+   %PUT &MSGTYPE-  If not in the default directory, include full path;
+   %goto Syntax;
+%end;
+%if %SUPERQ(ProgramFile2)= %then %do;
+   %let MSGTYPE=ERROR;
+   %PUT &MSGTYPE:  *&sysmacroname ERROR ***************************************;
+   %PUT &MSGTYPE-  You must specify the name of the second SAS program file;
+   %PUT &MSGTYPE-  If not in the default directory, include full path;
+   %goto Syntax;
 %end;
    %if %SUPERQ(Details) = %then   %let Details=N;
    %if %SUPERQ(TimesToRun)= %then %let TimesToRun=5;
@@ -44,7 +51,7 @@
    %PUT NOTE- Running each program &TimesToRun times;
    %PUT ;
   /* Capture the path to the SAS executable file - this works ONLY on WINDOWS */
-   %let StartSAS=%str("%trim(%sysget(SASROOT))\sas.exe"  -CONFIG "D:\MasterData\Custom Autocall Macros\sasv9_batch.cfg");
+   %let StartSAS="!SASROOT\sas.exe";
   /* Identify the WORK library's physical location - we'll write our temp files there */
    %let TempPath=%qsysfunc(PATHNAME(WORK));
    %Let FileName1=%qscan(%superq(ProgramFile1),-1,/\);
