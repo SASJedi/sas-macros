@@ -6,33 +6,36 @@
    to be called by itself, so has minimal parameter checking and error
    message capability.
   ***************************************************************************/
-   %if   %qupcase(%qsubstr(&dsn,1,5))=!HELP 
-      OR %qupcase(%qsubstr(&dsn,1,4))=HELP %then
+   %let MSGTYPE=NOTE;
+   %if %superq(dsn)=? %then
       %do;
-         %PUT NOTE:  *BenchmarkReport MACRO Documentation *******************************;
-         %PUT NOTE-  %NRSTR(SYNTAX: %%BenchmarkReport%(dsn,FileName1,FileNam2,TimesToRun%));
-         %PUT NOTE-     DSN=Name of the data set produced by the benchmarkparse macro;
-         %PUT NOTE-         Default: work.;
-         %PUT NOTE-         Example: work.MyData;
-         %PUT NOTE-     FileName1=First program file name;
-         %PUT NOTE-         Example: MyProgram1;
-         %PUT NOTE-     FileName2=Second program file name;
-         %PUT NOTE-         Example: MyProgram2;
-         %PUT NOTE-     TimesRun=Number of times the original program was run (integers only);
-         %PUT NOTE-         Default: 5;
+         %PUT &MSGTYPE:  *BenchmarkReport MACRO Documentation *******************************;
+         %PUT &MSGTYPE-  %NRSTR(SYNTAX: %%BenchmarkReport%(dsn,FileName1,FileNam2,TimesToRun%));
+         %PUT &MSGTYPE-     DSN=Name of the data set produced by the benchmarkparse macro;
+         %PUT &MSGTYPE-         Default: work.;
+         %PUT &MSGTYPE-         Example: work.MyData;
+         %PUT &MSGTYPE-     FileName1=First program file name;
+         %PUT &MSGTYPE-         Example: MyProgram1;
+         %PUT &MSGTYPE-     FileName2=Second program file name;
+         %PUT &MSGTYPE-         Example: MyProgram2;
+         %PUT &MSGTYPE-     TimesRun=Number of times the original program was run (integers only);
+         %PUT &MSGTYPE-         Default: 5;
          %PUT &MSGTYPE-     Detals=Include detailed data report (Y or N);
          %PUT &MSGTYPE-         Default: N;
          %PUT;
-         %PUT NOTE-  Example:;
-            %PUT NOTE-  Benchmarking a program: ;
-            %PUT NOTE-  %NRSTR(%%BenchmarkReport%(work.MyParsedData);
-            %PUT NOTE-  %NRSTR(           ,test1.sas);
-            %PUT NOTE-  %NRSTR(           ,test2.sas);
-/*            %PUT NOTE-  %NRSTR(           ,C:\temp\test1.xls);*/
-            %PUT NOTE-  %NRSTR(           ,5%));
-            %PUT NOTE-  *************************************************************;
-            %RETURN;
+         %PUT &MSGTYPE-  Example:;
+         %PUT &MSGTYPE-  Benchmarking a program: ;
+         %PUT &MSGTYPE-  %NRSTR(%%BenchmarkReport%(work.MyParsedData);
+         %PUT &MSGTYPE-  %NRSTR(           ,test1.sas);
+         %PUT &MSGTYPE-  %NRSTR(           ,test2.sas);
+         %PUT &MSGTYPE-  %NRSTR(           ,5%));
+         %PUT &MSGTYPE-  *************************************************************;
+         %PUT ;
+         %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+         %PUT ;
+         %RETURN;
       %end;
+   %if %qupcase(%qsubstr(%superq(dsn),1,5))=!HELP %then goto Syntax;
    %if %SUPERQ(DSN)= %then
       %do;
          %let DSN=work.logparse_data;
