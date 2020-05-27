@@ -9,16 +9,8 @@
    http://support.sas.com
   ***************************************************************************/
 %macro benchmarkparse(program, saslog, outds, system, pdsloc, append=NO );
-%let MSGTYPE=NOTE;
-   %if %superq(saslog)=  %then
-      %do;
-         %let MSGTYPE=ERROR;
-         %PUT &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
-         %PUT &MSGTYPE-  You must specify the name of the SAS log file;
-         %PUT ;
-         %GoTo SyntaxHelp;
-      %end;
-   %if %qupcase(%superq(saslog))=!HELP %then
+   %let MSGTYPE=NOTE;
+   %if %superq(program)=? %then
       %do;
          %PUT &MSGTYPE:  &SYSMACRONAME MACRO SYNTAX*********************************************;
          %SyntaxHelp: %put;
@@ -31,7 +23,27 @@
          %PUT &MSGTYPE-          PDSLOC=PDS file name (required for z/OS only);
          %PUT &MSGTYPE-          APPEND=append to OUTDS - default is NO (writes over);
          %PUT &MSGTYPE-  ***********************************************************************;
+         %PUT ;
+         %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+         %PUT ;
          %GoTo exit;
+      %end;
+%if %qupcase(%qsubstr(%superq(ProgramFile1),1,5))=!HELP %then goto Syntax;
+   %if %superq(program)=  %then
+      %do;
+         %let MSGTYPE=ERROR;
+         %PUT &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
+         %PUT &MSGTYPE-  You must specify the name of the program file;
+         %PUT ;
+         %GoTo SyntaxHelp;
+      %end;
+   %if %superq(saslog)=  %then
+      %do;
+         %let MSGTYPE=ERROR;
+         %PUT &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
+         %PUT &MSGTYPE-  You must specify the name of the SAS log file;
+         %PUT ;
+         %GoTo SyntaxHelp;
       %end;
    %if &outds= %then
       %let outds=work.logparse_data;
