@@ -31,6 +31,7 @@
          %PUT &MSGTYPE-  %NRSTR(           ,5%));
          %PUT &MSGTYPE-  *************************************************************;
          %PUT ;
+         %PUT NOTE:  Designed to be called by the %NRSTR(%%)benchmark macro. Not intended for stand-alone use.;
          %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
          %PUT ;
          %RETURN;
