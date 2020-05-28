@@ -24,7 +24,8 @@
          %PUT &MSGTYPE-          APPEND=append to OUTDS - default is NO (writes over);
          %PUT &MSGTYPE-  ***********************************************************************;
          %PUT ;
-         %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+         %PUT NOTE:  Designed to be called by the %NRSTR(%%)benchmark macro. Not intended for stand-alone use.;
+         %PUT NOTE-  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
          %PUT ;
          %GoTo exit;
       %end;
