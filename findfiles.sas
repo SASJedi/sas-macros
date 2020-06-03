@@ -1,99 +1,128 @@
-%macro findfiles(dir, ext,sub,dsn) / minoperator;
+%macro findfiles(dir,ext,dsn,sub) / minoperator;
   /***************************************************************************
    Created by Mark Jordan - http://go.sas.com/jedi
+   Last Modified: 2020-06-03
    This macro program (findfiles.sas) should be placed in your AUTOCALL path.
+   Dependencies on other custom macros:
+    - exist.sas
+    - fileattribs.sas
+    - translate.sas
  ***************************************************************************/
 %local fileref rc did i n memname didc cmd nummem rootdirlen;
 %let type=NOTE;
-   %if %qupcase(%superq(dir))=!HELP 
-   %then %do;
-   %let type=NOTE;
-%syntax:
-   %PUT ;
-   %PUT &TYPE:  *&SYSMACRONAME Documentation *******************************;
-   %PUT &TYPE-;
-   %PUT &TYPE-  Produces a list of files with a specified extension in the log;
-   %PUT &TYPE-  or optionally writes them to a dataset.;
-   %PUT &TYPE-;
-   %PUT &TYPE-  SYNTAX: %NRSTR(%%FindFiles%(dir,ext<,sub,dsn>%));
-   %PUT &TYPE-     dir=fully qualified directory path;
-   %PUT &TYPE-     ext=Space delimited list of file extensions;
-   %PUT &TYPE-     sub=look in subfolders? (1=yes);
-   %PUT &TYPE-     dsn=name of data set to store filenames (Optional);
-   %PUT ;
-   %PUT &TYPE-  Example: ;
-   %PUT &TYPE-  %NRSTR(%%FindFiles%(c:\temp, csv%));
-   %PUT &TYPE-  %NRSTR(%%FindFiles%(\\server\folder\, xls xlsx xlsm, work.myfiles%));
-   %PUT ;
-   %PUT &TYPE-  *************************************************************;
-   %PUT ;
-   %RETURN;
+%if %superq(ext) = %then %let ext=ALL;
+%if %superq(sub) = %then %let sub=Y;
+%if %superq(dir) = %then %do;
+   %let type=ERROR;
+   %put &TYPE: (&sysmacroname) You must specify a directory.;
+   %return;
 %end;
+%else %let dir=%translate(%superq(dir),/,\);
+%if %qsubstr(%qupcase(%superq(dir)),1,1) in ! ?  %then 
+   %do;
+      %let type=NOTE;
+%syntax:
+      %PUT ;
+      %PUT &TYPE:  *&SYSMACRONAME Documentation *******************************;
+      %PUT &TYPE-;
+      %PUT &TYPE-  Produces a list of files with a specified extension in the log;
+      %PUT &TYPE-  or optionally writes them to a dataset.;
+      %PUT &TYPE-;
+      %PUT &TYPE-  SYNTAX: %NRSTR(%%FindFiles%(dir,<ext,dsn,sub>%));
+      %PUT &TYPE-     dir=fully qualified directory path;
+      %PUT &TYPE-     ext=Space delimited list of file extensions (Optional, default is ALL);
+      %PUT &TYPE-     dsn=name of data set to store filenames (Optional, otherwise writes to log.);
+      %PUT &TYPE-     sub=look in subfolders? (Y|N default is Y);
+      %PUT ;
+      %PUT &TYPE-  Example: ;
+      %PUT &TYPE-  %NRSTR(%%FindFiles%(c:\temp, csv%));
+      %PUT &TYPE-  %NRSTR(%%FindFiles%(\\server\folder\, xls xlsx xlsm, work.myfiles%));
+      %PUT &TYPE-  %NRSTR(%%FindFiles%(s:/workshop,sas,work.pgm_files,N%));
+      %PUT ;
+      %PUT &TYPE-  *************************************************************;
+      %PUT ;
+      %RETURN;
+   %end;
    %let rc=%sysfunc(filename(fileref,%superq(dir)));
    %let did=%sysfunc(dopen(%superq(fileref)));
    %if &did=0 %then %do;
       %put ERROR: Directory %qupcase(%superq(dir)) does not exist.;
       %return;
    %end;
-   %let nummem=0;
-   %if %superq(sub)= %then %let sub=1;
-   %if %datatyp(%superq(sub)) ^= NUMERIC %then %let sub=1;
-   %if %superq(sub)=1 %then %let rootdirlen=%eval(%length(%superq(dir))+1);
-   %else %let rootdirlen=%eval(%length(%superq(dir))+&sub);;
-   %do n=1 %to %qsysfunc(dnum(&did));
-      %let memname=%qsysfunc(dread(&did,&n));
-      %if %qscan(&memname,2,.)= and %superq(sub)^= %then %do;
-          /* This is subfolder - read it too */
-          %findfiles(%superq(dir)/%superq(memname),%superq(ext),%length(%superq(dir)),%superq(dsn));
+   %if %SYSMEXECDEPTH=1 and %superq(dsn) ^= %then %do;
+      %if %exist(%superq(dsn)) %then %do;
+         proc fedsql;
+            drop table %superq(dsn) force;
+            drop table this force;
+         quit;
       %end;
-      %else %if %qupcase(%qscan(%superq(memname),-1,.)) in %qupcase(%superq(ext)) %then %do;
-         %let nummem=%eval(&nummem+1);
-         %let mem&nummem=%superq(memname);
-         %local sz&nummem cr&nummem mod&nummem;
-         %fileattribs(%superq(dir)\%superq(memname),sz&nummem,cr&nummem,mod&nummem);
+   %end;
+   %let nummem=0;
+   %if %superq(sub)= %then %let sub=Y;
+   %do n=1 %to %sysfunc(dnum(&did));
+      %let memname=%qsysfunc(dread(&did,&n));
+      %if %fileattribs(%superq(dir)/%superq(memname))=DIR and &sub=Y %then %do;
+          /* This is subfolder - read it too */
+          %findfiles(%superq(dir)/%superq(memname),%superq(ext),%superq(dsn),%superq(sub));
+      %end;
+      %if %fileattribs(%superq(dir)/%superq(memname))=ERROR %then %do;
+          %PUT ERROR: Unable to retrieve attributeds for %superq(dir)/%superq(memname);
+      %end;
+      %else %if %superq(ext) ^= %then %do;
+         %if %qupcase(%superq(ext))=ALL %then 
+         %do;
+            %let nummem=%eval(&nummem+1);
+            %local mem&nummem fileinfo&nummem;
+            %let mem&nummem=%superq(memname);
+            %let fileinfo&nummem=%fileattribs(%superq(dir)/%superq(memname));
+         %end;
+         %else %if %qupcase(%qscan(%superq(memname),-1,.)) in %qupcase(%superq(ext)) %then %do;
+            %let nummem=%eval(&nummem+1);
+            %local mem&nummem fileinfo&nummem;
+            %let mem&nummem=%superq(memname);
+            %let fileinfo&nummem=%fileattribs(%superq(dir)/%superq(memname));
+         %end;
       %end;
    %end;
    %let didc=%qsysfunc(dclose(%superq(did)));
    %let rc=%qsysfunc(filename(fileref));
-/*   %put _local_;*/
-/*   %return;*/
    %if %superq(dsn) ^= and &nummem > 0 %then %do;
+   ;
    data this;
-      length Item 8 Path SubDir $512 Filename $124 Size CRDate CRTime ModDate ModTime 8; 
+      length Item 8 Path $512 Filename $124 Size CRDate CRTime ModDate ModTime 8; 
+      keep   Item   Path      Filename      Size CRDate CRTime ModDate ModTime; 
       format Size comma16. CRDate ModDate mmddyy10. CRTime ModTime time.;
       label Size='Size (Bytes)';
-      %do i=1 %to &nummem;
-      Path="%superq(dir)";
-      SubDir=SUBSTR("%superq(dir)",%superq(rootdirlen));
-      Item=&i;
-      Filename="&&mem&i";
-      Size=&&sz&i;
-      CRDate=datepart(input("&&cr&i",datetime.));
-      CRTime=timepart(input("&&cr&i",datetime.));
-      ModDate=datepart(input("&&mod&i",datetime.));
-      ModTime=timepart(input("&&mod&i",datetime.));
-      output;
-      %end;
+      retain Path "%superq(dir)";
+      array f  [&nummem] $512 _temporary_ (%do i=1 %to &nummem;"&&mem&i"%str( ) %end;);
+      array fi [&nummem] $550 _temporary_ (%do i=1 %to &nummem;"&&fileinfo&i"%str( ) %end;);
+      do item=1 to &nummem;
+         Filename=f[item];
+         Size=input(scan(fi[item],1,'|'),best32.);
+         CRDate=datepart(input(scan(fi[item],2,'|'),datetime.));
+         CRTime=timepart(input(scan(fi[item],2,'|'),datetime.));
+         ModDate=datepart(input(scan(fi[item],3,'|'),datetime.));
+         ModTime=timepart(input(scan(fi[item],3,'|'),datetime.));
+         output;
+      end;
    run;
    proc append base=%superq(dsn) data=this;
    run;
-   proc delete data=this;
+   proc sort data=%superq(dsn);
+      by path filename;
    run;
+   proc fedsql;
+      drop table work.this force;
+   quit;
+
    %end;
    %else %do ;
       %put;
       %put NOTE: &nummem files found in %superq(dir):;
+      %put NOTE- File Name | Bytes | Created | Modified:;
       %do i=1 %to &nummem;
-      %put NOTE- &&mem&i &&bytes&i bytes,created &&created&i, modifed &&modifed&i  ;
+      %put NOTE- &&mem&i|&&fileinfo&i;
       %end;
       %put;
    %end;
-   proc sort data=%superq(dsn);
-      by path filename;
-   run;
-   data %superq(dsn);
-      modify %superq(dsn);
-      subdir=tranwrd(path,"%superq(dir)",'');
-   run;
 %mend findfiles;
-
