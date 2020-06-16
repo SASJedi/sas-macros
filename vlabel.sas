@@ -11,7 +11,7 @@
    %PUT &MSGTYPE-  the variable label;
    %goto Syntax;
 %end;
-%if %qupcase(%qsubstr(%superq(dsn),1,%sysfunc(min(%length(%superq(dsn)),5))))=!HELP 
+%if %superq(dsn)=? 
    %then %do;
    %PUT &MSGTYPE:  *&SYSMACRONAME Documentation ***************************************;
    %PUT &MSGTYPE-  This macro returns the text of the lable associates with ;
@@ -26,6 +26,7 @@
    %PUT &MSGTYPE-  *************************************************************;
    %RETURN;
 %end;
+%if %qupcase(%superq(dsn))=!HELP %then %goto Syntax; 
 
    %local dsid vnum label rc i;
    %if %sysfunc(exist( %superq(dsn)))=0 %then %do;
