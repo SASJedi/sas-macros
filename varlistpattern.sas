@@ -19,7 +19,6 @@ Es wird kein SAS code generiert - kann in-line verwendet werden
 **********************************************************************/
 %local dsid prxPattern prxMatch rc nVars varname i _varType varlist ls;
 
-%let ls=%qsysfunc(getoption(LS));
 %let MSGTYPE=NOTE;
 %if %sysevalf( %superq(dsn) = , boolean ) = 1 %then %do;
    %let MSGTYPE=ERROR;
@@ -27,11 +26,10 @@ Es wird kein SAS code generiert - kann in-line verwendet werden
    %PUT &MSGTYPE-  You must specify a data set name;
    %goto Syntax;
 %end;
-%if %qupcase(%qsubstr(%superq(dsn),1,%sysfunc(min(%length(%superq(dsn)),5))))=!HELP 
+%if %superq(dsn)=? or %qupcase(%superq(dsn))=!HELP 
    %then %do;
    %PUT &MSGTYPE:  *&SYSMACRONAME Documentation *******************************;
 %syntax: %put;
-   options ls=90;
    %PUT &MSGTYPE-  SYNTAX: %NRSTR(%%)&SYSMACRONAME%NRSTR(%(dsn,pattern,varType,runType%));
    %PUT &MSGTYPE-     DSN:     Data set name (Required);
    %PUT &MSGTYPE-     pattern: Pattern describing the desired names;
@@ -50,7 +48,6 @@ Es wird kein SAS code generiert - kann in-line verwendet werden
    %PUT &MSGTYPE-  %NRSTR(%%)&SYSMACRONAME%NRSTR(%(sashelp.class,?e?%));
    %PUT &MSGTYPE-  *************************************************************;
    %PUT ;
-   options ls=&ls;
    %RETURN;
 %end;
 
