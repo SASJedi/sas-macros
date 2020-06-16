@@ -8,15 +8,7 @@
    %let msgtype=ERROR;
    %put &msgtype: You must specify a data set name;
    %put;
-   %goto syntax;
-%end;
-%let dsn=%qupcase(%superq(dsn));
-%if %superq(dsn)=!HELP %then %do;
 %syntax:
-   data _null_;
-      call symput ('LS',getoption('LS','startupvalue'));
-   run;
-   options ls=100;
    %put &msgtype: &SYSMACRONAME macro help document:;
    %put &msgtype- Purpose: Converts a data set to a SAS DATA step.;
    %put &msgtype- Syntax: %nrstr(%%)&SYSMACRONAME(dsn<,lib,outlib,file,obs,fmt,lbl>);
@@ -37,9 +29,10 @@
    %put NOTE-   Data set label is automatically re-created.;
    %put NOTE-   Only numeric column formats can be re-created, character column formats are ingnored.;
    %put NOTE-   Use !HELP to print these notes.;
-   options ls=&ls;
    %return;
 %end; 
+%let dsn=%qupcase(%superq(dsn));
+%if %superq(dsn)=? or %superq(dsn)=!HELP %then %goto Syntax;
 %if %superq(fmt)= %then %let fmt=YES;
 %let fmt=%qupcase(&fmt);
 %if %superq(lbl)= %then %let lbl=YES;
