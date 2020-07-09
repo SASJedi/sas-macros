@@ -4,9 +4,9 @@
 2. Add the local path to your SASAUTOS autocall path. <br>
 3. Call the macro by name with ? or !help as the parameter to get syntax help in the log.<br> 
    For example:<br>
-      <b>%data2datastep(?)</b><br><br>
+      <b>%data2datastep(?)</b><br>
       <b>%data2datastep(!help)</b><br><br>
-   Produces this text in the SAS log:<br><br>
+   Produces this text in the SAS log:<br>
    NOTE: DATA2DATASTEP macro help document:<br>
       Purpose: Converts a data set to a SAS DATA step.<br>
       Syntax: %DATA2DATASTEP(dsn<,lib,outlib,file,obs,fmt,lbl>)<br>
