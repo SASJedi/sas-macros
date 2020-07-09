@@ -51,7 +51,7 @@
    %PUT NOTE- Running each program &TimesToRun times;
    %PUT ;
   /* Capture the path to the SAS executable file - this works ONLY on WINDOWS */
-   %let StartSAS="!SASROOT\sas.exe";
+   %let StartSAS="%sysget(SASROOT)\sas.exe";
   /* Identify the WORK library's physical location - we'll write our temp files there */
    %let TempPath=%qsysfunc(PATHNAME(WORK));
    %Let FileName1=%qscan(%superq(ProgramFile1),-1,/\);
@@ -64,7 +64,7 @@ data _null_;
    file "&TempPath\test1.sas";
    if _n_=1 then do;
       PUT "OPTIONS FULLSTIMER NOMPRINT NOSOURCE NOMLOGIC NOSYMBOLGEN SPOOL;";
-      PUT %NRSTR("%PASSINFO");
+      PUT '%PASSINFO';
    end;
    input;
    put _infile_;
@@ -74,7 +74,7 @@ data _null_;
    file "&TempPath\test2.sas";
    if _n_=1 then do;
       PUT "OPTIONS FULLSTIMER NOMPRINT NOSOURCE NOMLOGIC NOSYMBOLGEN SPOOL;";
-      PUT %NRSTR("%PASSINFO");
+      PUT '%PASSINFO';
    end;
    input;
    put _infile_;
