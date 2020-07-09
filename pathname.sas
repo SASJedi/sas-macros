@@ -4,15 +4,8 @@
 ********************************************************************/
 %local MSGTYPE path engine;
 %let MSGTYPE=NOTE;
-%if %SUPERQ(ref)=  %then %do;
-   %let MSGTYPE=ERROR;
-   %put;
-   %put &MSGTYPE: (&SYSMACRONAME) You must provide a FILEREF or LIBREF value.;
-   %put;
-   %goto Syntax;
-   %return;
-%end; 
-%if %qsubstr(%SUPERQ(ref),1,1)=! %then %do;
+
+%if %qsubstr(%SUPERQ(ref),1,1)=! or %superq(ref)=? %then %do;
 %Syntax:
    %put;
    %put &MSGTYPE: &SYSMACRONAME macro help document:;
@@ -25,6 +18,15 @@
    %put &MSGTYPE- Example:;
    %put &MSGTYPE- %nrstr(%%)&SYSMACRONAME(WORK);
    %put;
+   %return;
+%end; 
+
+%if %SUPERQ(ref)=  %then %do;
+   %let MSGTYPE=ERROR;
+   %put;
+   %put &MSGTYPE: (&SYSMACRONAME) You must provide a FILEREF or LIBREF value.;
+   %put;
+   %goto Syntax;
    %return;
 %end; 
 
@@ -48,7 +50,14 @@
    %goto Syntax;
 %end; 
 
-%let engine=%mf_getengine(%superq(ref));
+ %let dsid=%sysfunc(open(sashelp.vlibnam(where=(libname="%superq(ref)")),i));
+ %if (&dsid ^= 0) %then %do;  
+   %let engnum=%sysfunc(varnum(&dsid,ENGINE));
+   %let rc=%sysfunc(fetch(&dsid));
+   %let engine=%sysfunc(getvarc(&dsid,&engnum));
+   %let rc= %sysfunc(close(&dsid.));
+ %end;
+
 %if not (%qsubstr(%superq(engine),1,1)=V)%then %do;
    %let MSGTYPE=WARNING;
    %put;
