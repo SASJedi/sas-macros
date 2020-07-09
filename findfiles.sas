@@ -10,14 +10,6 @@
  ***************************************************************************/
 %local fileref rc did i n memname didc cmd nummem rootdirlen;
 %let type=NOTE;
-%if %superq(ext) = %then %let ext=ALL;
-%if %superq(sub) = %then %let sub=Y;
-%if %superq(dir) = %then %do;
-   %let type=ERROR;
-   %put &TYPE: (&sysmacroname) You must specify a directory.;
-   %return;
-%end;
-%else %let dir=%translate(%superq(dir),/,\);
 %if %qsubstr(%qupcase(%superq(dir)),1,1) in ! ?  %then 
    %do;
       %let type=NOTE;
@@ -43,6 +35,14 @@
       %PUT ;
       %RETURN;
    %end;
+%if %superq(dir) = %then %do;
+   %let type=ERROR;
+   %put &TYPE: (&sysmacroname) You must specify a directory.;
+   %goto Syntax;
+%end;
+%if %superq(ext) = %then %let ext=ALL;
+%if %superq(sub) = %then %let sub=Y;
+%else %let dir=%translate(%superq(dir),/,\);
    %let rc=%sysfunc(filename(fileref,%superq(dir)));
    %let did=%sysfunc(dopen(%superq(fileref)));
    %if &did=0 %then %do;
