@@ -3,16 +3,20 @@
    Created by Mark Jordan: http://go.sas.com/jedi or Twitter @SASJedi
    This macro program (putc.sas) should be placed in your AUTOCALL path.
   ***************************************************************************/
-   %if %superq(value)=!HELP %then %do;
+   %local MSGTYPE;
+   %let msgtype=NOTE;
+   %if %superq(value)=? or %qupcase(%superq(value))=!HELP %then %do;
    %syntax:
-      %put &msgtype: &SYSMACRONAME macro help document:;
+      %put;
+      %put &msgtype: *&SYSMACRONAME macro help *****************************;
       %put &msgtype- Purpose: Formats a character value in SAS macro code.;
       %put &msgtype- Syntax: %nrstr(%%)&SYSMACRONAME(value,format);
-      %put &msgtype- value:  Required. Numeric value to format.;
-      %put &msgtype- format: Required. Numeric format to apply to the value.;
+      %put &msgtype- value:  Required. Character value to format.;
+      %put &msgtype- format: Required. Character format to apply to the value.;
       %put;
-      %put NOTE:   (&SYSMACRONAME) Only numeric values and formats can be specified.;
-      %put NOTE-   Use !HELP to print these usage notes.;
+      %put NOTE-   Only character values and formats can be specified.;
+      %put &msgtype- *******************************************************;
+      %put;
       %return;
    %end;
 	%if %superq(value)= or %superq(format)= %then
