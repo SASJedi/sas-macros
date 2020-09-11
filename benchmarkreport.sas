@@ -55,12 +55,11 @@
               /* proportion to trim in each tail      */
    N_sd=2     /* Number of standard deviations        */);
    ods output TrimmedMeans=trimmed(keep=VarName Mean Stdmean DF);
-   ods html close;
+   ods select TrimmedMeans;
    proc univariate data=&Dsn trim=&Trim;
      var &Var_list;
    run;
    ods output close;
-   ods html;
    data restructure;
       set &Dsn;
       length Varname $ 32;
