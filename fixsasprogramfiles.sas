@@ -67,7 +67,7 @@ data _null_;
    infile readme;
    file   writeme;
    input ;
-   _infile_=tranwrd(_infile_,%tslit(%superq(findme)),%tslit(%superq(fixme)));
+   _infile_ =prxchange("s~c:\\workshop\\winsas\\bfex~&path~i", -1, _infile_);
    put _infile_;
 run;
 
