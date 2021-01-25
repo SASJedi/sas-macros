@@ -42,7 +42,7 @@
 %end;
 %if %superq(ext) = %then %let ext=ALL;
 %if %superq(sub) = %then %let sub=Y;
-%else %let dir=%translate(%superq(dir),/,\);
+%let dir=%translate(%superq(dir),/,\);
    %let rc=%sysfunc(filename(fileref,%superq(dir)));
    %let did=%sysfunc(dopen(%superq(fileref)));
    %if &did=0 %then %do;
