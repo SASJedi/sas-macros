@@ -1,5 +1,10 @@
 %macro renameFile(dir,oldname, newname);
-   %local command rc slash;
+  /***************************************************************************
+   Created by Mark Jordan - http://go.sas.com/jedi
+   The macro program (renameFiles.sas) should be placed in your AUTOCALL path.
+   Also requires macro program translate.sas in autocall path.
+ ***************************************************************************/
+ %local command rc slash;
    %let MSGTYPE=NOTE;
    %if %superq(dir)= %then
       %do;
