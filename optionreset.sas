@@ -1,33 +1,32 @@
-%macro OptionReset(opt);
+%macro OptionReset(opt)/minoperator;
   /***************************************************************************
    Created by Mark Jordan - http://go.sas.com/jedi
-   August 14, 2012
-   This macro is intended to reset any SAS system options which have been 
-   changed during the SAS session back to the values they had at startup.  
+   2012/08/12
+   This macro resets any SAS system option changed during the SAS session 
+   back to the values startup value. (Tested only on Windows)
    To see syntax help in the SAS log, submit: 
-      %OptionReset(!HELP) 
+      %OptionReset(?) 
+   Updated 2020/02/08 - better handling of help request.
   ***************************************************************************/
 %local where;
-%if %qupcase(%SUPERQ(opt))=!HELP 
-   %then %do;
+%if %qsubstr(%qupcase(%superq(opt))xx,1,1) in ! ?  %then 
+   %do;
    %PUT ;
    %PUT NOTE:  *&SYSMACRONAME MACRO Documentation *******************************;
    %PUT NOTE-  This macro resets modified SAS system option values back to;
    %PUT NOTE-  the original startup values.;  
    %PUT ;
-   %PUT NOTE-  >>>>> Tested on Windows only <<<<<;
-   %PUT NOTE-  ;
-   %PUT NOTE-  SYNTAX: %NRSTR(%%OptionReset%(<opt>%));
+   %PUT NOTE-  SYNTAX: %NRSTR(%%)&sysmacroname%NRSTR(%(<opt>%));
    %PUT NOTE-     opt: standard name of the SAS System option you want to reset;
    %PUT NOTE-     OPTIONAL - if not specified, resets any option with a current;
    %PUT NOTE-                value different from the startup value.;
    %PUT ;
    %PUT NOTE-  Examples: ;
    %PUT NOTE-     To reset only the LINESIZE option:;
-   %PUT NOTE-        %NRSTR(%%OptionReset%(LINESIZE%));
+   %PUT NOTE-        %NRSTR(%%)&sysmacroname%NRSTR(%(LINESIZE%));
    %PUT ;
    %PUT NOTE-     To reset all options:;
-   %PUT NOTE-        %NRSTR(%%OptionReset%(%));
+   %PUT NOTE-        %NRSTR(%%)&sysmacroname%NRSTR(%(%));
    %PUT ;
    %PUT NOTE-  ********************************************************************;
    %RETURN;
@@ -59,20 +58,24 @@
    %else 
    %do;
       /* No option specified                                     */
-      /* Exclude options you can't change while SAS is executing */
-      %let WHERE=where optstart ne 'startup' and optname not in ('AWSDEF','FONT');
+      /* Exclude options you can't or shouldn't change while SAS is executing */
+      %let WHERE=where optstart ne 'startup' and optname not in ('AWSDEF','FONT','FORMCHAR','SYNTAXCHECK');
    %end;
 
 /* Reset those options that differ from the startup values */
 data _null_;
    length statement startup current $1024;
-   set sashelp.voption;
+   set sashelp.voption end=last;
    &where;
    startup=getoption(optname,'startupvalue');
    current=getoption(optname);
    if startup ne current then do;
-      PUTLOG "NOTE: OptionReset Macro Resetting " optname " from " current " to " startup ".";
+/*      PUTLOG "NOTE: OptionReset Macro Resetting " optname " from " current " to " startup ".";*/
       statement =cat('OPTIONS ',getoption(optname,'keyword, startupvalue'),';');
+      call execute(statement );   
+   end;
+   if last then do;
+      statement =cat('OPTIONS NOSYNTAXCHECK;');
       call execute(statement );   
    end;
 run;
