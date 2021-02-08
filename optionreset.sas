@@ -59,23 +59,19 @@
    %do;
       /* No option specified                                     */
       /* Exclude options you can't or shouldn't change while SAS is executing */
-      %let WHERE=where optstart ne 'startup' and optname not in ('AWSDEF','FONT','FORMCHAR','SYNTAXCHECK');
+      %let WHERE=where optstart ne 'startup' and optname not in ('AWSDEF','FONT','FORMCHAR');
    %end;
 
 /* Reset those options that differ from the startup values */
 data _null_;
    length statement startup current $1024;
-   set sashelp.voption end=last;
+   set sashelp.voption;
    &where;
    startup=getoption(optname,'startupvalue');
    current=getoption(optname);
    if startup ne current then do;
 /*      PUTLOG "NOTE: OptionReset Macro Resetting " optname " from " current " to " startup ".";*/
       statement =cat('OPTIONS ',getoption(optname,'keyword, startupvalue'),';');
-      call execute(statement );   
-   end;
-   if last then do;
-      statement =cat('OPTIONS NOSYNTAXCHECK;');
       call execute(statement );   
    end;
 run;
