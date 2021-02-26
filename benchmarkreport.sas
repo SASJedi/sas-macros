@@ -32,11 +32,11 @@
          %PUT &MSGTYPE-  *************************************************************;
          %PUT ;
          %PUT NOTE:  Designed to be called by the %NRSTR(%%)benchmark macro. Not intended for stand-alone use.;
-         %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+         %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%)) for help.;
          %PUT ;
          %RETURN;
       %end;
-   %if %qupcase(%qsubstr(%superq(dsn),1,5))=!HELP %then goto Syntax;
+   %if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? %then goto Syntax;
    %if %SUPERQ(DSN)= %then
       %do;
          %let DSN=work.logparse_data;

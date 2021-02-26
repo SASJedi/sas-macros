@@ -24,7 +24,7 @@
          %put &MSGTYPE-           Optional - default is DROP;
          %put &MSGTYPE-   outlib: Output libref. Optional - default is WORK;
          %put;
-         %put &MSGTYPE- Use !HELP to print these notes.;
+         %put &MSGTYPE- Use ? to print these notes.;
          %put;
          %PUT &MSGTYPE-  Example:;
          %PUT &MSGTYPE-  %NRSTR(%%)&SYSMACRONAME%NRSTR(%(sashelp.iris,species));
@@ -35,7 +35,7 @@
          %return;
       %end;
    %if %superq(table)=? or %qupcase(%superq(table))=!HELP %then
-      %goto syntax;
+   %if %qsubstr(%SUPERQ(table),1,1)=! or %superq(table)=? %then %goto syntax;
    %if %superq(column)= %then
       %do;
          %let MSGTYPE=ERROR;

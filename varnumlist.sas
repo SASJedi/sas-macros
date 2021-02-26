@@ -18,7 +18,7 @@
    %PUT;
    %GoTo Exit;
 %end;
-%if %SUPERQ(DSN)=? or %qupcase(%SUPERQ(DSN))=!HELP %then %goto Syntax;
+%if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? %then %goto Syntax;
 %let DSN=%qupcase(%superq(dsn));
 %if %superq(cols)= %then 
 %do;

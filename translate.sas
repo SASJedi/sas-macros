@@ -11,7 +11,7 @@
          %PUT &MSGTYPE-     text=Text to be processed; 
          %PUT &MSGTYPE-     to= the character which replaces the FROM character; 
          %PUT &MSGTYPE-     from=the character to be replaced; 
-         %PUT &MSGTYPE-     ? or !HELP produces this syntax help in the SAS log;
+         %PUT &MSGTYPE-     ? produces this syntax help in the SAS log;
          %PUT ;
          %PUT &MSGTYPE-  Example: ;
          %PUT &MSGTYPE-  %NRSTR(%%)&sysmacroname%str(%(Mr. Julia,s,r%));
@@ -23,7 +23,7 @@
          %PUT &MSGTYPE-  *************************************************************;
          %RETURN;
    %end;
-   %if %qupcase(%superq(text))=!HELP %then %goto syntax;
+   %if %qsubstr(%SUPERQ(text),1,1)=! or %superq(text)=? %then %goto syntax;
    /* Produce the translated text*/
    %qsysfunc(translate(%superq(text),%superq(to),%superq(from)))
 %mend;

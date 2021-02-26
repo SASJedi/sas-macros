@@ -25,11 +25,10 @@
    %PUT &MSGTYPE-  %NRSTR(           ,s:\workshop\MyProgram2.sas,6,Y%));
    %PUT &MSGTYPE-  *************************************************************;
    %PUT ;
-   %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+   %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%%) for help.;
    %PUT ;
    %RETURN;
 %end;
-%if %qupcase(%qsubstr(%superq(ProgramFile1),1,5))=!HELP %then goto Syntax;
 %if %SUPERQ(ProgramFile1)= %then %do;
    %let MSGTYPE=ERROR;
    %PUT &MSGTYPE:  *&sysmacroname ERROR ***************************************;

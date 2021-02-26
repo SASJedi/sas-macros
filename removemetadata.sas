@@ -38,8 +38,7 @@
 
          %RETURN;
       %end;
-   %if %superq(dsn)=? or %qupcase(%superq(dsn))=!HELP %then
-      %goto Syntax;
+   %if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? %then %goto Syntax;
    %if %superq(attribs)= %then
       %let attribs=FIL;
    %else %let attribs=%qupcase(%superq(attribs));

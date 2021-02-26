@@ -1,21 +1,21 @@
 %macro varListPattern(dsn, pattern, varType,runType);
 /********************************************************************
-Von Bruno Mueller - 2017-08
-Selbstdokumentation und Modusauswahl von Mark Jordan
-Holen Sie sich eine Liste von Variablennamen aus einem Datensatz, 
-die mit einem bestimmten Muster übereinstimmen.
+By Bruno Mueller - 2017-08
+Self-documentation and mode selection by Mark Jordan
+Get a list of variable names from a data set,
+that match a certain pattern.
 
-Platzhalter für Muster
-"*", 0 - n Zeichen
-"?", 1 Charakter
-Alle anderen Buchstaben, Zahlen werden entsprechend verwendet
+Placeholder for pattern
+"*", 0 - n characters
+"?", 1 character
+All other letters and numbers are used accordingly
 
-Programm verwendet diese DATA Step Funktionen:
+Program uses these DATA Step functions:
 OPEN, CLOSE, ATTRN, VARNAME, VARTYPE, PRXMATCH, GETOPTION
 
-Vorteile:
-Kann auf jeder SAS data set verwendet werden
-Es wird kein SAS code generiert - kann in-line verwendet werden
+Benefits:
+Can be used on any SAS data set
+No SAS code is generated - can be used in-line
 **********************************************************************/
 %local dsid prxPattern prxMatch rc nVars varname i _varType varlist ls;
 
@@ -26,7 +26,7 @@ Es wird kein SAS code generiert - kann in-line verwendet werden
    %PUT &MSGTYPE-  You must specify a data set name;
    %goto Syntax;
 %end;
-%if %superq(dsn)=? or %qupcase(%superq(dsn))=!HELP 
+%if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? 
    %then %do;
    %PUT &MSGTYPE:  *&SYSMACRONAME Documentation *******************************;
 %syntax: %put;

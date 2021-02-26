@@ -2,7 +2,7 @@
 /********************************************************************
  Created by Mark Jordan @SASJedi http://go.sas.com/jedi
  Save the macro source code file (deletemacvars.sas) in the AUTOCALL path. 
- Call the macro with ? or !HELP as the parameter for usage and syntax
+ Call the macro with ? as the parameter for usage and syntax
  Published 2/18/2019
  https://raw.githubusercontent.com/SASJedi/jedi-sas-tricks/master/deletemacvars.sas
 ********************************************************************/
@@ -11,7 +11,7 @@
 %let MsgType=NOTE;
 %let ls=%qsysfunc(getoption(ls));
 options ls=100;
-%if %SUPERQ(Prefix)=? or %SUPERQ(Prefix)=!HELP %then %do;
+%if %SUPERQ(Prefix)=? %then %do;
 %Syntax:
    %put &MsgType: *&SYSMACRONAME Documentation: ***************************************;
    %put;
@@ -22,7 +22,7 @@ options ls=100;
    %put &MsgType- Prefix: The first few letters of a series of macro names.;
    %put &MsgType-         If null, deletes all global scope macro variables;
    %put &MsgType-         except those created by the SAS system.;
-   %put &MsgType-         (? or !HELP produces this syntax help in the SAS log);
+   %put &MsgType-         (? produces this syntax help in the SAS log);
    %put;
    %put &MsgType-   Keep: If not null, keeps the variables for the specified prefix.;
    %put &MsgType-         Otherwise, deletes only variables for the specified prefix.;

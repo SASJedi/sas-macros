@@ -32,8 +32,7 @@
 
          %RETURN;
       %end;
-   %if %superq(dir)=? or %qupcase(%superq(dir))=!HELP %then
-      %goto syntax;
+   %if %qsubstr(%SUPERQ(dir),1,1)=! or %superq(dir)=? %then %goto syntax;
    %if %superq(oldname)= %then
       %do;
          %let MSGTYPE=ERROR;

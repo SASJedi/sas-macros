@@ -5,7 +5,7 @@
   ***************************************************************************/
    %local MSGTYPE;
    %let msgtype=NOTE;
-   %if %superq(value)=? or %qupcase(%superq(value))=!HELP %then %do;
+   %if %qsubstr(%SUPERQ(value),1,1)=! or %superq(value)=? %then %do;
    %syntax:
       %put;
       %put &msgtype: *&SYSMACRONAME macro help *****************************;

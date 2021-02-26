@@ -5,7 +5,7 @@
 %local MSGTYPE path engine;
 %let MSGTYPE=NOTE;
 
-%if %qsubstr(%SUPERQ(ref),1,1)=! or %superq(ref)=? %then %do;
+%if %superq(ref)=? %then %do;
 %Syntax:
    %put;
    %put &MSGTYPE: &SYSMACRONAME macro help document:;
@@ -13,7 +13,7 @@
    %put &MSGTYPE- Syntax: %nrstr(%%)&SYSMACRONAME(ref<,mod>);
    %put &MSGTYPE-    ref: Required - a valid LIBREF or FILEREF.;
    %put &MSGTYPE-    mod: Optional - L to specify LIBREF, F to specify FILEREF.;
-   %put &MSGTYPE- Use !HELP to print these notes.;
+   %put &MSGTYPE- Use ? to print these notes.;
    %put;
    %put &MSGTYPE- Example:;
    %put &MSGTYPE- %nrstr(%%)&SYSMACRONAME(WORK);

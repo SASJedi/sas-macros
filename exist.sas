@@ -1,4 +1,4 @@
-%macro exist(dsn);
+%macro exist(dsn) /minoperator;
 %local MsgType;
 %let MsgType=NOTE;
 %if %superq(dsn)= %then %do; 
@@ -9,7 +9,7 @@
    %put;
    %goto Syntax; 
 %end;
-%if %qupcase(%SUPERQ(dsn))=!HELP %then %do;
+%if %SUPERQ(dsn)= ? %then %do;
 %Syntax:
    %put;
    %put &MsgType: &SYSMACRONAME documentation:;
@@ -19,7 +19,7 @@
    %put ;
    %put &MsgType- Example: %nrstr(%%)&SYSMACRONAME(sashelp.cars);;
    %put ;
-   %put &MsgType- Use !HELP to print documentation to the SAS log.;
+   %put &MsgType- Use ? to print documentation to the SAS log.;
    %put;
    %return;
 %end; 

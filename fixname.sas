@@ -4,22 +4,22 @@
 %if %superq(badname)= %then %do; 
    %let MsgType=ERROR;
    %put;
-   %put &MsgType: &SYSMACRONAME Error:;
+   %PUT &MsgType: *&SYSMACRONAME ERROR *******************************;
    %put &MsgType- You must supply a name.;
    %put;
    %goto Syntax; 
 %end;
-%if %SUPERQ(badname)=%str(?) or %qupcase(%SUPERQ(badname))=!HELP %then %do;
+%if %SUPERQ(badname)=%str(?)  %then %do;
+   %PUT &MsgType: *&SYSMACRONAME Documentation *******************************;
 %Syntax:
-   %put;
-   %put &MsgType: &SYSMACRONAME documentation:;
+   %PUT &MsgType-;
    %put &MsgType- Purpose: Create a valid SAS name from an input text string;
    %put &MsgType- Syntax: %nrstr(%%)&SYSMACRONAME(badname);
    %put &MsgType- badname: Text to be processed;
    %put ;
    %put &MsgType- Example: %nrstr(%%)&SYSMACRONAME(1 bad table name!);;
    %put ;
-   %put &MsgType- Use ? or !HELP to print documentation to the SAS log.;
+   %put &MsgType- Use ? to print documentation to the SAS log.;
    %put;
    %return;
 %end; 

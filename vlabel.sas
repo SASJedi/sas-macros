@@ -26,7 +26,7 @@
    %PUT &MSGTYPE-  *************************************************************;
    %RETURN;
 %end;
-%if %qupcase(%superq(dsn))=!HELP %then %goto Syntax; 
+%if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? %then %goto Syntax; 
 
    %local dsid vnum label rc i;
    %if %sysfunc(exist( %superq(dsn)))=0 %then %do;

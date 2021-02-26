@@ -11,12 +11,12 @@
    %if &DSN= %then
       %let DSN=&SYSLAST;
    %let MSGTYPE=NOTE;
-   %if %superq(DSN)=? or %qupcase(%superq(DSN))=!HELP %then
+   %if %superq(DSN)=? %then
       %do;
-   %Syntax:
          %put;
          %PUT &MSGTYPE: *&SYSMACRONAME Documentation ********************************;
          %put;
+   %Syntax:
          %PUT &MSGTYPE- SYNTAX: %NRSTR(%endswith%(DSN,Suffix%));
          %put;
          %PUT &MSGTYPE- DSN: Name of dataset containing variable names of interest;

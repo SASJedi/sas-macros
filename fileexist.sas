@@ -21,14 +21,13 @@
          %PUT &TYPE-     fname=fully qualified file name;
          %PUT;
          %PUT &TYPE-  Example:;
-         %PUT &TYPE-  %NRSTR(%%filexist%(\\server\folder\MyFile.csv%));
+         %PUT &TYPE-  %NRSTR(%%filexist%(/home/myid/myfile.csv%));
          %PUT;
          %PUT &TYPE-  *************************************************************;
 
          %RETURN;
       %end;
-   %if %superq(fname)=? or %qupcase(%superq(fname))=!HELP %then
-      %goto syntax;
+   %if %superq(fname)=? %then %goto syntax;
 
    %sysfunc(fileexist(%superq(fname)))
 %mend fileexist;

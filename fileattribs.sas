@@ -19,7 +19,7 @@
          %PUT &TYPE:  *&SYSMACRONAME Documentation *******************************;
          %PUT &TYPE-  SYNTAX: %NRSTR(%fileattribs%(filename%));
          %PUT &TYPE-     filename=fully qualified filename;
-         %PUT &TYPE-     Use ? or !HELP for syntax help;
+         %PUT &TYPE-     Use ? for syntax help;
          %PUT &TYPE-;
          %PUT &TYPE-  Returns:;
          %PUT &TYPE-  ERROR if an error occurred;
@@ -38,8 +38,7 @@
 
          %RETURN;
       %end;
-   %if %superq(filename)=? or %qupcase(%superq(filename))=!HELP %then
-      %goto Syntax;
+   %if %superq(filename)=? %then %goto Syntax;
 
    %let filename=%translate(%superq(filename),/,\);
    %let rc=%sysfunc(filename(thisfile,&filename));

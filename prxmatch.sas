@@ -8,7 +8,7 @@
    %put;
    %goto syntax;
 %end;
-%if %qupcase(%superq(regex))=!HELP %then %do;
+%if %superq(ref)=? %then %do;
 %syntax:
    %put &msgtype: &SYSMACRONAME macro help document:;
    %put &msgtype- Purpose: Tests a string for a PERL regular expression match.;
@@ -19,7 +19,7 @@
    %put;
    %PUT &MSGTYPE-  Example:;
    %PUT &MSGTYPE-  %NRSTR(%prxmatch%(/\d\d\d/,abc123%));
-   %put NOTE-   Use !HELP to print these notes.;
+   %put NOTE-   Use ? to print these notes.;
    %return;
 %end;
 %if %superq(string)= %then %do;

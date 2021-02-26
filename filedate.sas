@@ -25,14 +25,13 @@
          %PUT;
          %PUT &TYPE-  Examples:;
          %PUT &TYPE-  %NRSTR(%filename%(C:\temp\MyProgram.sas%));
-         %PUT &TYPE-  %NRSTR(%filename%(\\server\folder\MyFile.csv,date9.%));
+         %PUT &TYPE-  %NRSTR(%filename%(/home/myID/myfile.csv,date9.%));
          %PUT;
          %PUT &TYPE-  *************************************************************;
 
          %RETURN;
       %end;
-   %if %superq(fname)=? OR %qupcase(%superq(fname))=!HELP %then
-      %goto syntax;
+   %if %superq(fname)=? %then %goto syntax;
 
    %let file=%qscan(%superq(fname),-1,%str(\/));
    %if %length(&file)=%length(&fname) %then

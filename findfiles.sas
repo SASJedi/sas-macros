@@ -9,35 +9,35 @@
     - translate.sas
  ***************************************************************************/
 %local fileref rc did i n memname didc cmd nummem rootdirlen;
-%let type=NOTE;
-%if %qsubstr(%qupcase(%superq(dir)),1,1) in ! ?  %then 
+%let MsgType=NOTE;
+%if %superq(dir)=?  %then 
    %do;
-      %let type=NOTE;
+      %PUT ;
+      %PUT &MsgType:  *&SYSMACRONAME Documentation *******************************;
+      %PUT &MsgType-;
 %syntax:
+      %PUT &MsgType-  Produces a list of files with a specified extension in the log;
+      %PUT &MsgType-  or optionally writes them to a dataset.;
+      %PUT &MsgType-;
+      %PUT &MsgType-  SYNTAX: %NRSTR(%%FindFiles%(dir,<ext,dsn,sub>%));
+      %PUT &MsgType-     dir=fully qualified directory path;
+      %PUT &MsgType-     ext=Space delimited list of file extensions (Optional, default is ALL);
+      %PUT &MsgType-     dsn=name of data set to store filenames (Optional, otherwise writes to log.);
+      %PUT &MsgType-     sub=look in subfolders? (Y|N default is Y);
       %PUT ;
-      %PUT &TYPE:  *&SYSMACRONAME Documentation *******************************;
-      %PUT &TYPE-;
-      %PUT &TYPE-  Produces a list of files with a specified extension in the log;
-      %PUT &TYPE-  or optionally writes them to a dataset.;
-      %PUT &TYPE-;
-      %PUT &TYPE-  SYNTAX: %NRSTR(%%FindFiles%(dir,<ext,dsn,sub>%));
-      %PUT &TYPE-     dir=fully qualified directory path;
-      %PUT &TYPE-     ext=Space delimited list of file extensions (Optional, default is ALL);
-      %PUT &TYPE-     dsn=name of data set to store filenames (Optional, otherwise writes to log.);
-      %PUT &TYPE-     sub=look in subfolders? (Y|N default is Y);
+      %PUT &MsgType-  Example: ;
+      %PUT &MsgType-  %NRSTR(%%FindFiles%(c:\temp, csv%));
+      %PUT &MsgType-  %NRSTR(%%FindFiles%(\\server\folder\, xls xlsx xlsm, work.myfiles%));
+      %PUT &MsgType-  %NRSTR(%%FindFiles%(s:/workshop,sas,work.pgm_files,N%));
       %PUT ;
-      %PUT &TYPE-  Example: ;
-      %PUT &TYPE-  %NRSTR(%%FindFiles%(c:\temp, csv%));
-      %PUT &TYPE-  %NRSTR(%%FindFiles%(\\server\folder\, xls xlsx xlsm, work.myfiles%));
-      %PUT &TYPE-  %NRSTR(%%FindFiles%(s:/workshop,sas,work.pgm_files,N%));
-      %PUT ;
-      %PUT &TYPE-  *************************************************************;
+      %PUT &MsgType-  *************************************************************;
       %PUT ;
       %RETURN;
    %end;
 %if %superq(dir) = %then %do;
-   %let type=ERROR;
-   %put &TYPE: (&sysmacroname) You must specify a directory.;
+   %let MsgType=ERROR;
+      %PUT &MsgType:  *&SYSMACRONAME Error *******************************;
+   %put &MsgType: You must specify a directory.;
    %goto Syntax;
 %end;
 %if %superq(ext) = %then %let ext=ALL;

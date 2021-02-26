@@ -35,7 +35,7 @@
          %PUT;
          %return;
       %end;
-   %if %superq(dsn)=? or %qupcase(%superq(dsn))=!HELP %then
+   %if %superq(dsn)=? %then
       %goto syntax;
    %if %SUPERQ(listvar)= %then
       %do;
