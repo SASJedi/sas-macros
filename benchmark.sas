@@ -25,7 +25,7 @@
    %PUT &MSGTYPE-  %NRSTR(           ,s:\workshop\MyProgram2.sas,6,Y%));
    %PUT &MSGTYPE-  *************************************************************;
    %PUT ;
-   %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%%) for help.;
+   %PUT NOTE:  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%)) for help.;
    %PUT ;
    %RETURN;
 %end;
