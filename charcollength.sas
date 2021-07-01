@@ -6,14 +6,17 @@
       %put &msgtype: You must specify a data set name;
       %put;
    %syntax:
+      %put;
       %put &msgtype: &SYSMACRONAME macro help document:;
       %put &msgtype- Purpose: Shortens a specified character column;
       %put &msgtype-          to fit the largest actual value.;
-      %put &msgtype- Syntax: %nrstr(%%)&SYSMACRONAME(dsn);
-      %put &msgtype- dsn:    Name of the dataset to modified.;
+      %put &msgtype- Syntax: %nrstr(%%)&SYSMACRONAME(dsn,col);
+      %put &msgtype- dsn:    Name of the dataset.;
+      %put &msgtype- col:    Name of the column to be modified.;
       %put;
-      %put NOTE:   &SYSMACRONAME cannot be used in-line - it generates code.;
-      %put NOTE-   Use ? to print these notes.;
+      %put NOTE: &SYSMACRONAME cannot be used in-line - it generates code.;
+      %put NOTE- Use ? to print these notes.;
+      %put;
       %return;
    %end; 
    %if %qsubstr(%SUPERQ(dsn),1,1)=! or %superq(dsn)=? %then %goto syntax;
