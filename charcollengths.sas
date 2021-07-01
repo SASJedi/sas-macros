@@ -20,6 +20,8 @@
    %let lib=%qscan(%superq(dsn),1,.);
    %if %superq(dsn)=%superq(lib) %then %let lib="WORK";
    %let dsn=%qscan(%superq(dsn),-1,.);
+   %let dsn=%qupcase(%superq(dsn));
+   %let lib=%qupcase(%superq(lib));
    proc sql noprint;
    select name 
      into: name1- 
@@ -30,6 +32,6 @@
    ;
    quit;
    %do i=1 %to &sqlobs;
-   %charVarLength(&lib..&dsn,&&name&i)
+   %charColLength(&lib..&dsn,&&name&i)
    %end;
 %mend;
