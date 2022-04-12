@@ -29,7 +29,7 @@
          %PUT ;
          %GoTo exit;
       %end;
-%if %qupcase(%qsubstr(%superq(ProgramFile1),1,5))=!HELP %then goto Syntax;
+%if %qupcase(%qsubstr(%superq(program),1,5))=!HELP %then goto Syntax;
    %if %superq(program)=  %then
       %do;
          %let MSGTYPE=ERROR;
