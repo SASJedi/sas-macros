@@ -14,7 +14,7 @@
       %do;
          %PUT &MSGTYPE:  &SYSMACRONAME MACRO SYNTAX*********************************************;
          %SyntaxHelp: %put;
-         %PUT &MSGTYPE-  SYNTAX: %NRSTR(%logparse(PROGRAM,SASLOG,OUTDS,SYSTEM,PDSLOC,APPEND=));
+         %PUT &MSGTYPE-  SYNTAX: %NRSTR(%%)&SYSMACRONAME(PROGRAM,SASLOG,OUTDS,SYSTEM,PDSLOC,APPEND=);
          %PUT &MSGTYPE-          PROGRAM=Name of the program that produced the log (no path, no extent);
          %PUT &MSGTYPE-          SASLOG=log file name.  Include path unless on z/OS ;
          %PUT &MSGTYPE-          OUTDS=output dataset name - default: work.logparse_data;
