@@ -1,4 +1,4 @@
-﻿%macro copyFiles(srcdir, tgtdir, subdirs)/minoperator;
+﻿%macro copyfiles(srcdir, tgtdir, subdirs)/minoperator;
 	%local nmem numfiles numdir thisext fileref msgtype;
 	%let msgtype=NOTE;
 
@@ -22,6 +22,7 @@
 		   %put %nrstr();
 		   %put &MSGTYPE:   &SYSMACRONAME does not require X command permissions, but the SAS Administrator;
 		   %put &MSGTYPE-   can disable the functions required for this macro using LOCKDOWN mode.;
+		   %put &MSGTYPE-   This macro uses the associated %nrstr(%%)copyfile macro to copy individual files.;
 		   %put %nrstr();
 	      %PUT &MSGTYPE-  Examples:;
 		   %put &MSGTYPE-  Copy everything including subdirectories to a backup location:;
@@ -138,19 +139,7 @@
 	/* Copy the files first */
    %put NOTE: Copying &numfiles files:;
    %do i=1 %to &numfiles;
-			/* Assign filerefs to source and target */
-			%let fileref=copyfrom;
-			%let rc=%sysfunc(filename(fileref,%superq(srcdir)/%superq(mem&i)));
-			%let fileref=copyto;
-			%let rc=%sysfunc(filename(fileref,%superq(tgtdir)/%superq(mem&i)));
-			/* Copy source to target */
-			%let rc=%sysfunc(fcopy(copyfrom,copyto));
-		   %put NOTE- Copied  %superq(srcdir)/%superq(mem&i) to %superq(tgtdir);
-			/* Clear filerefs */
-			%let fileref=copyfrom;
-			%let rc=%sysfunc(filename(fileref));
-			%let fileref=copyto;
-			%let rc=%sysfunc(filename(fileref));
+		%copyfile(%superq(srcdir)/%superq(mem&i),%superq(tgtdir)/%superq(mem&i));
    %end;
    %put;
 
@@ -160,7 +149,6 @@
 		   %put NOTE: Copying &numdir subfolders:;
 		   %do i=1 %to &numdir;
 				   %put NOTE- Copying subfolder %superq(srcdir)/%superq(dir&i) to %superq(tgtdir)/%superq(dir&i);
-				  	%let rc=%sysfunc(dcreate(%superq(dir&i),%superq(tgtdir)));	
 					/* Executing a direct macro call causes an endless loop, creating subdir within subdir infinitely */
 					/* Using DOSUBL here avoids the over-iteration. */
 					%let command=%nrstr(%%)copyfiles(%superq(srcdir)/%superq(dir&i),%superq(tgtdir)/%superq(dir&i));
@@ -177,4 +165,4 @@
    %let rc=%qsysfunc(filename(fileref));
 	%let fileref=todir;
    %let rc=%qsysfunc(filename(fileref));
-%mend copyFiles;
+%mend copyfiles;
