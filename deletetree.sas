@@ -61,13 +61,16 @@
 
 /****** Main processing begins here ********/
 /* Create a dataset of all files and folders in the structure */
-%FindFiles(~/PG1V2,,work.deleteMe)
+%FindFiles(%superq(dir),,work.deleteMe)
 
 /* Add the top-level directory to the data */
 proc sql;
 insert into deleteme (path, filename)
-	values('~','PG1V2');
+	values('~',"%qscan(%superq(dir),-1,/\)");
+title "Files to be deleted";
+select * from deleteme;
 quit;
+title;
 
 /* Delete all files and create a data set with folder names and tree level */
 data folders;
