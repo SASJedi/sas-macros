@@ -1,4 +1,4 @@
-%macro BenchmarkReport(dsn,FileName1,FileName2,TimesToRun,Details);
+﻿%macro BenchmarkReport(dsn,FileName1,FileName2,TimesToRun,Details);
   /***************************************************************************
    Created by Mark Jordan: http://go.sas.com/jedi or Twitter @SASJedi
    This macro program (benchmarkreport.sas) should be placed in your AUTOCALL 
@@ -54,6 +54,7 @@
               /* from each tail; if between 0 and .5, */
               /* proportion to trim in each tail      */
    N_sd=2     /* Number of standard deviations        */);
+   options VARINITCHK=NOTE;
    ods output TrimmedMeans=trimmed(keep=VarName Mean Stdmean DF);
    ods select TrimmedMeans;
    proc univariate data=&Dsn trim=&Trim;

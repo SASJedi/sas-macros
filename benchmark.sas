@@ -1,4 +1,4 @@
-%macro Benchmark(ProgramFile1,ProgramFile2,TimesToRun,Details);
+﻿%macro Benchmark(ProgramFile1,ProgramFile2,TimesToRun,Details);
   /***************************************************************************
    Created by Mark Jordan: http://go.sas.com/jedi or Twitter @SASJedi
    This macro program (benchmark.sas) should be placed in your AUTOCALL path, 
@@ -57,6 +57,7 @@
    %Let FileName2=%qscan(%superq(ProgramFile2),-1,/\);
 
 /* The work starts here */
+options VARINITCHK=NOTE;
 /*First, add calls to the passinfo macro and OPTIONS FULLSTIMER to pgrgram file*/
 data _null_;
    infile "&ProgramFile1" ;
@@ -114,6 +115,7 @@ options xwait;
 %macro passinfo;
   %if ( &SYSSCP = OS ) %then /* MVS platform */
      %mvsname;
+options VARINITCHK=NOTE;
 
   data _null_;
     length  hostname $ 80;

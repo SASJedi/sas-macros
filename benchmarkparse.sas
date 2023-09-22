@@ -1,55 +1,52 @@
-  /***************************************************************************
-   Customized by Mark Jordan: http://go.sas.com/jedi or Twitter @SASJedi
+﻿  /***************************************************************************
+   Customized by Mark Jordan: http://sasjedi.blog or Twitter (X) @SASJedi
    This macro program (benchmarkparse.sas) should be placed in your AUTOCALL 
-   path. It is required to suport the %benchmark macro. It is not designed
-   to be called by itself, so has minimal parameter checking and error
-   message capability. It extracts performance statistics from a SAS log file.
-
-   Derived from the %LOGPARSE() macro. The original code was downloaded from 
-   http://support.sas.com
+   path. It is required to suport the %benchmark macro. It extracts performance 
+	statistics from a SAS log file.
+   Derived from the %LOGPARSE() macro downloaded from http://support.sas.com
   ***************************************************************************/
-%macro benchmarkparse(program, saslog, outds, system, pdsloc, append=NO );
+%macro benchmarkparse(program, saslog, outds, system, pdsloc, append);
    %let MSGTYPE=NOTE;
    %if %superq(program)=? %then
       %do;
-         %PUT &MSGTYPE:  &SYSMACRONAME MACRO SYNTAX*********************************************;
-         %SyntaxHelp: %put;
-         %PUT &MSGTYPE-  SYNTAX: %NRSTR(%%)&SYSMACRONAME(PROGRAM,SASLOG,OUTDS,SYSTEM,PDSLOC,APPEND=);
-         %PUT &MSGTYPE-          PROGRAM=Name of the program that produced the log (no path, no extent);
-         %PUT &MSGTYPE-          SASLOG=log file name.  Include path unless on z/OS ;
-         %PUT &MSGTYPE-          OUTDS=output dataset name - default: work.logparse_data;
-         %PUT &MSGTYPE-          SYSTEM=Operating System, if logs written on a different OS;
-         %PUT &MSGTYPE-                 than where they are being parsed;
-         %PUT &MSGTYPE-          PDSLOC=PDS file name (required for z/OS only);
-         %PUT &MSGTYPE-          APPEND=append to OUTDS - default is NO (writes over);
-         %PUT &MSGTYPE-  ***********************************************************************;
-         %PUT ;
-         %PUT NOTE:  Designed to be called by the %NRSTR(%%)benchmark macro. Not intended for stand-alone use.;
-         %PUT NOTE-  Use %NRSTR(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
-         %PUT ;
+         %put &MSGTYPE:  &SYSMACRONAME MACRO SYNTAX*********************************************;
+         %Syntax: 
+			%put ;
+         %put &MSGTYPE-  SYNTAX: %nrstr(%%)&SYSMACRONAME(PROGRAM,SASLOG,OUTDS,SYSTEM,PDSLOC,APPEND=);
+         %put &MSGTYPE-          PROGRAM: Name of the program that produced the log (no path, no extent);
+         %put &MSGTYPE-          SASLOG: log file name.  Include path unless on z/OS ;
+         %put &MSGTYPE-          OUTDS: output dataset name - default: work.logparse_data;
+         %put &MSGTYPE-          SYSTEM: Operating System, if logs written on a different OS;
+         %put &MSGTYPE-                  than where they are being parsed;
+         %put &MSGTYPE-          PDSLOC: PDS file name (required for z/OS only);
+         %put &MSGTYPE-          APPEND: append to output data set - default is NO (writes over);
+         %put &MSGTYPE-  ***********************************************************************;
+         %put ;
+         %put NOTE:  Designed to be called by the %nrstr(%%)benchmark macro. Not intended for stand-alone use.;
+         %put NOTE-  Use %nrstr(%%)&SYSMACRONAME%nrstr(%(?%) or %%)&SYSMACRONAME%nrstr(%(!HELP%)) for help.;
+         %put ;
          %GoTo exit;
       %end;
-%if %qupcase(%qsubstr(%superq(program),1,5))=!HELP %then goto Syntax;
    %if %superq(program)=  %then
       %do;
          %let MSGTYPE=ERROR;
-         %PUT &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
-         %PUT &MSGTYPE-  You must specify the name of the program file;
-         %PUT ;
-         %GoTo SyntaxHelp;
+         %put &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
+         %put &MSGTYPE-  You must specify the name of the program file;
+         %put ;
+         %GoTo Syntax;
       %end;
    %if %superq(saslog)=  %then
       %do;
          %let MSGTYPE=ERROR;
-         %PUT &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
-         %PUT &MSGTYPE-  You must specify the name of the SAS log file;
-         %PUT ;
-         %GoTo SyntaxHelp;
+         %put &MSGTYPE:   &SYSMACRONAME MACRO ERROR ************************************************;
+         %put &MSGTYPE-  You must specify the name of the SAS log file;
+         %put ;
+         %GoTo Syntax;
       %end;
    %if &outds= %then
       %let outds=work.logparse_data;
-   %if &append= %then
-      %let append=NO;
+   %if %qupcase(%qsubstr(%superq(append),1,1))=Y %then %let append=YES;
+		%else %let append=NO;
 
    /***************************************************************
    * If no system was specified, set it to the ID of the system
@@ -60,12 +57,13 @@
    %if ( &system = )  %then  %let system = &sysscp;
 
    /***************************************************************
-   * Normalize the value of the APPEND= keyword parameter.
+   * Set VARINTCHK to NOTE if required.
    ****************************************************************/
-   %let append = %upcase( &append );
-   %if ( &append = Y  ) %then %do;  %let append = YES;  %end;
-   %if ( &append = YE ) %then %do;  %let append = YES;  %end;
-   %if ( &append = N  ) %then %do;  %let append = NO;   %end;
+	%let VARINITCHK= %sysfunc(getoption(VARINITCHK));   
+	%if %superq(VARINITCHK) ne NOTE %then %do;
+		%put NOTE: VARINITCHK was %superq(VARINITCHK). Setting value to NOTE. ;  
+ 		options VARINITCHK=NOTE;
+	%end;
 
    /***************************************************************
    * Make sure APPEND= is now YES or NO.
@@ -91,6 +89,8 @@
    * Create requested data set using performance statistics found
    * in the LOG.
    ****************************************************************/
+   options VARINITCHK=NOTE;
+
       data _sas_logparse_temp_1_;
       length Program $50 logfile $ 200 stepname $ 20
              line $200 upcase_Line $ 200 prevline $ 200
@@ -251,6 +251,14 @@
       * iteration.
       *************************************************************/
       if (_n_ = 1) then do;
+		/************************************************************
+		Mark Jordan added: Skip SAS Studio preamble info if present
+      *************************************************************/
+		 input;
+		 if find(lowcase(_infile_),'/* region: generated preamble */') then 
+			do until (find(lowcase(_infile_),'/* endregion */') );
+				input;
+			end;
          %getline;
       end;
 
@@ -694,5 +702,8 @@
       run;
       proc delete data=_sas_logparse_temp_1_;
       run;
-%exit:  
+%exit:
+/* Restore VARINITCHK to the original value */
+options VARINITCHK=%superq(VARINITCHK);
+%put NOTE: VARINITCHK=%sysfunc(getoption(VARINITCHK));  
 %mend benchmarkparse;
