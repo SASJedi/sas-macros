@@ -1,4 +1,4 @@
-﻿%macro makeformat(formatName,fromDataSet,start,end,label,report);
+%macro makeformat(formatName,fromDataSet,start,end,label,report);
 	/* Self-documentation and robust parameter validation added  2023-09-14 by Mark Jordan */
 	/* Setup */
 	%local MsgType fmtType foundStart typeStart foundLabel typeLabel foundEnd typeEnd;
@@ -216,11 +216,15 @@
 	;
 	quit;
 
-	title "%qupcase(%superq(formatName)) format based on %upcase(&fromDataSet)";
-	proc format cntlin=%superq(formatName) %if %superq(report)= Y %then fmtlib;;
 	%if %superq(report)= Y %then %do;
+	title "%qupcase(%superq(formatName)) format based on %upcase(&fromDataSet)";
+	proc format cntlin=%superq(formatName) fmtlib;
+	%end;
+	%else %do;
+	ods exclude FORMAT;
+	proc format cntlin=%superq(formatName);
+	%end;
 		select &fmtType%superq(formatName);
-	%end;;
 	run;
 	title;
 	

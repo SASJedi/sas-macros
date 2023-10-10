@@ -1,90 +1,65 @@
-﻿%macro checkvar(dsn,var);
+%macro exist(memname,memtype)/minoperator mindelimiter='|';
 	/* Setup */
-	%local MsgType dsid varnum position;
+	%local MsgType dsid memtypenum position;
 	%let MsgType=NOTE;
 	
 	/* Self-documentation */
-	%if %SUPERQ(dsn)= ? %then %do;
+	%if %SUPERQ(memname)= ? %then %do;
 	%Syntax:
-	   %put;
+	   %put &MsgType- ;
 	   %put &MsgType: &SYSMACRONAME documentation:;
-	   %put &MsgType- Purpose: Check that a variable exists in the specified dataset;
-	   %put &MsgType- Syntax: %nrstr(%%)&SYSMACRONAME(dsn,var);
-	   %put &MsgType- dsn:    Name of the dataset;
-	   %put &MsgType- var:    Name of the variable;
-	   %put ;
-	   %put &MsgType- Example: %nrstr(%%)&SYSMACRONAME(sashelp.cars,MSRP);;
-	   %put ;
+	   %put &MsgType- ;
+	   %put &MsgType- Purpose: Check that a dataset exists.;
+	   %put &MsgType- ;
+	   %put &MsgType- Syntax: %nrstr(%%)&SYSMACRONAME(memname<,memtype>);
+	   %put &MsgType- ;
+	   %put &MsgType- memname:    Name of the dataset or other library member;
+	   %put &MsgType- memtype:    OPTIONAL - Type (DATA|CATALOG|ITEMSTOR|MDDB|VIEW);
+	   %put &MsgType-                        default is DATA;
+	   %put &MsgType- ;
+	   %put &MsgType- Returns:;
+	   %put &MsgType- 1 - Dataset or member exists.;
+	   %put &MsgType- 0 - Dataset or member does not exist.;
+	   %put &MsgType- . - An error occurred during processing.;
+	   %put &MsgType- ;
+	   %put &MsgType- Examples: %nrstr(%%)&SYSMACRONAME(sashelp.cars);
+	   %put &MsgType-           %nrstr(%%)&SYSMACRONAME(sashelp.vmacro,VIEW);
+	   %put &MsgType-           %nrstr(%%)&SYSMACRONAME(work.sasmacr,CATALOG);
+	   %put &MsgType- ;
 	   %put &MsgType- Use ? to print documentation to the SAS log.;
-	   %put;
-	   %if %superq(dsn) ne and %superq(var) ne %then goto exit;
+	   %put &MsgType- ;
 	   %return;
 	%end; 
 	
+	/* Set memtype default */
+	%if %superq(memtype)= %then %let memtype=DATA;
+	%let memtype=%qupcase(%superq(memtype));
+
 	/* Parameter validation */
 	/* Is dataset specified? */
-	%if %superq(dsn)= %then %do; 
+	%if %superq(memname)= %then %do; 
 	   %let MsgType=ERROR;
 	   %put;
 	   %put &MsgType: &SYSMACRONAME Error:;
-	   %put &MsgType- You must supply a dataset name.;
+	   %put &MsgType- You must supply a dataset or library member name.;
 	   %put;
-		errorNoDatasetName
+		.
 	   %goto Syntax; 
 	%end;
-	
-	/* Is variable name specified? */
-	%if %superq(var)= %then %do; 
+
+	/* Is memtype specified? */
+	%if not(%superq(memtype) in CATALOG|DATA|ITEMSTOR|MDDB|VIEW) %then %do; 
 	   %let MsgType=ERROR;
 	   %put;
 	   %put &MsgType: &SYSMACRONAME Error:;
-	   %put &MsgType- You must supply a variable name.;
+	   %put &MsgType- %superq(memtype) is not a valid member type.;
+	   %put &MsgType- Leave blank for DATA, or specify CATALOG, ITEMSTOR, MDDB, or VIEW.;
 	   %put;
-		errorNoVariableName
+		.
 	   %goto Syntax; 
 	%end;
 	
-   /* Open the specified dataset */
-   %let dsid=%sysfunc(open(&dsn));
+	/* Do the work */
+   %sysfunc(exist(&memname,&memtype))
 
-   /* If dataset won't open, return error */
-   %if &dsid=0 %then %do;
-      errorDataSet
-      %put ERROR: Cannot open dataset: %upcase(&dsn).;
-      %return;
-   %end;
-
-   /* If Variable not specified, return error */
-   %if &var=  %then %do;
-      errorNoVariablespecified
-      %put WARNING: Missing VAR parameter;
-      %goto exit;
-   %end;
-
-   /* If the variable name is not a valid, return error */
-   %if %sysfunc(nvalid(&var))=0 %then %do;
-      errorInvalidVariableName
-      %put ERROR: Invalid variable name: %upcase(&var).;
-      %goto exit;
-   %end;
-
-   /* Find position or the specified variable */   
-   %let position=%sysfunc(varnum(&dsid,&var));
-
-   /* If variable not found, return error */
-   %if &position=0 %then %do;
-      errorVariableNotExist
-      %put ERROR: Variable %upcase(&var) not in %upcase(&dsn).;
-      %goto exit;
-   %end;
-   
-   /* All good, return variable type (N)umeric or (C)haracter */
-   %sysfunc(vartype(&dsid,&position))
-
-   /* All good, grab data set label, just in case you want it */
-   %let label=%sysfunc(varlabel(&dsid,&position));
-
-   /* Exit gracefully */
-   %exit: %let dsid=%sysfunc(close(&dsid));
-
-%mend checkvar;
+%mend exist;
