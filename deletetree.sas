@@ -63,44 +63,53 @@
 /* Create a dataset of all files and folders in the structure */
 %FindFiles(%superq(dir),,work.deleteMe)
 
-/* Add the top-level directory to the data */
-proc sql;
-insert into deleteme (path, filename)
-	values('~',"%qscan(%superq(dir),-1,/\)");
-title "Files to be deleted";
-select * from deleteme;
-quit;
-title;
+%if %exist(work.deleteMe) %then %do;
+	/* Add the top-level directory to the data */
+	proc sql;
+	insert into deleteme (path, filename)
+		values('~',"%qscan(%superq(dir),-1,/\)");
+	title "Files to be deleted";
+	select * from deleteme;
+	quit;
+	title;
 
-/* Delete all files and create a data set with folder names and tree level */
-data folders;
-	set work.deleteMe(keep=Path Filename Size);
-	file=catx('/',path,filename);
-	level=countc(file,'/')-1;
-	if missing(size) then output;
-	else do;
+	/* Delete all files and create a data set with folder names and tree level */
+	data folders;
+		set work.deleteMe(keep=Path Filename Size);
+		file=catx('/',path,filename);
+		level=countc(file,'/')-1;
+		if missing(size) then output;
+		else do;
+			 fname="axeme";
+			 rc=filename(fname,file);
+			 if rc = 0 and fexist(fname) then rc=fdelete(fname);
+			 rc=filename(fname);
+		end;
+		keep file level;
+	run;
+
+	/* Sort by descending tree level so de delete the deepest folders first */
+	proc sort data=folders;
+		by descending level;
+	run;
+
+	/* Delete the folders */
+	data _null_;
+		set work.folders;
 		 fname="axeme";
 		 rc=filename(fname,file);
 		 if rc = 0 and fexist(fname) then rc=fdelete(fname);
 		 rc=filename(fname);
-	end;
-	keep file level;
-run;
-
-/* Sort by descending tree level so de delete the deepest folders first */
-proc sort data=folders;
-	by descending level;
-run;
-
-/* Delete the folders */
-data _null_;
-	set work.folders;
-	 fname="axeme";
-	 rc=filename(fname,file);
-	 if rc = 0 and fexist(fname) then rc=fdelete(fname);
-	 rc=filename(fname);
-run;
-
+	run;
+%end;
+%else %do;
+	data _null_;
+		 fname="axeme";
+		 rc=filename(fname,%tslit(&dir));
+		 if rc = 0 and fexist(fname) then rc=fdelete(fname);
+		 rc=filename(fname);
+	run;
+%end;
 /* Clean up the system (hide the evidence :-) */
 proc fedsql;
 	drop table deleteme force;
