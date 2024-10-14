@@ -4,13 +4,12 @@
 
 1. Clone this repository to a local path.
 2. Add the local path to your SASAUTOS autocall path. 
-3. Call the macro by name with ? or !help as the parameter to get syntax help in the log
+3. Call the macro by name with ? as the parameter to get syntax help in the log
 
 For example:
 
 ```sas
 %data2datastep(?)
-%data2datastep(!help)
 ```
 
 Produces this text in the SAS log:
