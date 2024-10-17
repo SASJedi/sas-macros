@@ -1,12 +1,13 @@
-%macro spdeFileSize(libref,dsn);
+﻿%macro spdeFileSize(libref,dsn);
 %local MsgType;
 %let MsgType=NOTE;
-%if %SUPERQ(source)= ? %then %do;
+%if %SUPERQ(libref)= ? %then %do;
 %Syntax:
    %put &MsgType- ;
    %put &MsgType: &SYSMACRONAME documentation:;
-   %put &MsgType- Purpose: For an SPDE library dataset, fined the filesize for each;
-   %put &MsgType-          individual sub-file, and the overall total size;
+   %put &MsgType- ;
+   %put &MsgType- Purpose: For an SPDE library dataset, find the filesize for each;
+   %put &MsgType-          individual sub-file, and the sum of the individual sizes.;
    %put &MsgType- ;
    %put &MsgType- Syntax: %nrstr(%%)&SYSMACRONAME(libref,dsn);
    %put &MsgType- libref: Libref of the SPDE library;
