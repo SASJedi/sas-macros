@@ -13,7 +13,7 @@
    %put &MsgType- libref: Libref of the SPDE library;
    %put &MsgType- dsn:    Name of the dataset in the SPDE library;
    %put &MsgType- ;
-   %put &MsgType- Example: %nrstr(%%)&SYSMACRONAME(spdelib,myTable);
+   %put &MsgType- Example: %nrstr(%%)&SYSMACRONAME(spdelib,test);
    %put &MsgType- Result:  ;
    %put &MsgType- ;
    %put &MsgType- |----------------------------------------------------------|;
