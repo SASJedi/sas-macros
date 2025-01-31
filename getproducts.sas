@@ -1,0 +1,71 @@
+﻿%macro getProducts(dsn);
+%local MsgType;
+%let MsgType=NOTE;
+%if %superq(dsn)=?  %then 
+   %do;
+      %PUT &MsgType-;
+      %PUT &MsgType:  *&SYSMACRONAME Documentation *******************************;
+      %PUT &MsgType-;
+%syntax:
+      %PUT &MsgType-  Produces a dataset containing licensed SAS product information.;
+      %PUT &MsgType-;
+      %PUT &MsgType-  SYNTAX: %NRSTR(%%)&SYSMACRONAME(dsn);
+      %PUT &MsgType-     dsn=name of dataset to be created;
+      %PUT ;
+      %PUT &MsgType-  Example: ;
+      %PUT &MsgType-  %NRSTR(%%)&SYSMACRONAME(work.sas_products);
+      %PUT &MsgType-;
+      %PUT &MsgType-  *************************************************************;
+      %PUT &MsgType-;
+      %RETURN;
+   %end;
+%if %superq(dsn) = %then %do;
+   %let MsgType=ERROR;
+      %PUT &MsgType:  *&SYSMACRONAME Error *******************************;
+   %put &MsgType: You must specify an output data set.;
+   %goto Syntax;
+%end;
+data _null_;
+	set sashelp.voption;
+	where optname='LINESIZE';
+	call symputx('LS',setting,'L');
+run;
+
+options nonotes linesize=MAX;
+filename altlog temp;
+proc printto log=altlog;run;
+proc setinit; run;
+proc printto;run;
+
+data &dsn;
+	length Product $100 CPU $5 Expires 8 _CPU $ 10;
+	drop _:;
+	format Expires yymmddd10.;
+	infile altlog end=eof;
+	if _n_=1 then do;
+		do until (substr(_infile_,1,3)='---');
+			input;
+/* 			put "NOTE: " _infile_; */
+			if eof then stop;
+		end;
+		Product=substr(_infile_,4,100);
+		input @'(CPU ' _CPU @;
+		CPU=scan(_CPU,-1);
+		Expires=INPUT(substr(_infile_,105,9),date9.);
+		if not _ERROR_ then output;
+		_ERROR_=0;
+	end; 
+	else do;
+		input;
+/* 		put "NOTE- " _infile_; */
+		Product=substr(_infile_,4,100);
+		input @'(CPU ' _CPU @;
+		CPU=compress(scan(_CPU,-1),,'ka');
+		Expires=INPUT(substr(_infile_,105,9),date9.);
+		if not _ERROR_ then output;
+		_ERROR_=0;
+	end;
+run;
+filename altlog clear;
+options notes linesize=&ls;
+%mend;
